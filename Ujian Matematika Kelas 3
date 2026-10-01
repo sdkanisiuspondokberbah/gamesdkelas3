@@ -1,0 +1,1265 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FROG MATH ADVENTURE - Perkalian & Pembagian</title>
+    <style>
+        :root {
+            --primary: #4CAF50;
+            --primary-dark: #388E3C;
+            --secondary: #FFC107;
+            --secondary-dark: #FFA000;
+            --water-light: #4FC3F7;
+            --water-dark: #0288D1;
+            --text-light: #FFFFFF;
+            --text-dark: #333333;
+            --danger: #F44336;
+            --bg-color: #E1F5FE;
+            --leaf-color: #8BC34A;
+            --leaf-dark: #558B2F;
+            --font-main: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            --radius-lg: 16px;
+            --radius-md: 8px;
+            --shadow: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-hover: 0 6px 12px rgba(0,0,0,0.2);
+            --border-color: #333; /* Warna untuk garis pembatas */
+            --border-width: 4px;  /* Ketebalan garis pembatas */
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* --- GLOBAL UI --- */
+        .header-global {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 20px;
+            background: linear-gradient(to right, var(--water-dark), var(--water-light));
+            color: white;
+            box-shadow: var(--shadow);
+            z-index: 100;
+        }
+
+        .header-title {
+            font-size: 1.2rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .icon-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 8px 12px;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            font-size: 1.2rem;
+            transition: all 0.2s;
+        }
+
+        .icon-btn:hover {
+            background: rgba(255,255,255,0.4);
+            transform: scale(1.05);
+        }
+
+        .screen {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        /* --- MENU SCREEN --- */
+        #menu-screen {
+            background: linear-gradient(135deg, #E1F5FE, #B3E5FC);
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .menu-title-container {
+            margin-bottom: 40px;
+            animation: floatUpDown 3s ease-in-out infinite;
+        }
+
+        .menu-title {
+            font-size: 3rem;
+            color: var(--primary-dark);
+            text-shadow: 2px 2px 0px white, 4px 4px 0px rgba(0,0,0,0.1);
+            margin-bottom: 10px;
+            line-height: 1.1;
+        }
+
+        .menu-subtitle {
+            font-size: 1.2rem;
+            color: var(--water-dark);
+            font-weight: bold;
+        }
+
+        .menu-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 100%;
+            max-width: 300px;
+        }
+
+        .btn {
+            padding: 15px 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            border: none;
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            box-shadow: 0 6px 0px rgba(0,0,0,0.2);
+            transition: all 0.1s;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn:active {
+            transform: translateY(6px);
+            box-shadow: 0 0px 0px rgba(0,0,0,0.2);
+        }
+
+        .btn-primary { background-color: var(--primary); color: white; box-shadow: 0 6px 0px var(--primary-dark); }
+        .btn-secondary { background-color: var(--secondary); color: var(--text-dark); box-shadow: 0 6px 0px var(--secondary-dark); }
+        .btn-water { background-color: var(--water-light); color: var(--text-dark); box-shadow: 0 6px 0px var(--water-dark); }
+        .btn-danger { background-color: var(--danger); color: white; box-shadow: 0 6px 0px #b71c1c; }
+
+        .credit {
+            position: absolute;
+            bottom: 10px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* --- SETUP SCREEN --- */
+        #setup-screen {
+            background: linear-gradient(135deg, #E1F5FE, #B3E5FC);
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .setup-card {
+            background: white;
+            padding: 30px;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-hover);
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+        }
+
+        .setup-card h2 { margin-bottom: 20px; color: var(--primary-dark); }
+
+        .setup-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .setup-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: var(--water-dark);
+        }
+
+        .setup-options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        .setup-option {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: var(--radius-md);
+            text-align: center;
+            cursor: pointer;
+            border: 2px solid transparent;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .setup-option.selected {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary-dark);
+        }
+
+        /* --- GAME SCREEN (GRID) --- */
+        #game-screen {
+            background: var(--border-color); /* Warna dasar untuk garis pembatas */
+            /* gap dan padding akan diatur per mode */
+        }
+
+        /* Container grid utama */
+        .game-grid {
+            display: grid;
+            width: 100%;
+            height: 100%;
+            /* default no gap, akan di-override class spesifik */
+        }
+
+        /* Mode Solo: Tanpa gap, 1 kolom */
+        .grid-solo {
+            grid-template-columns: 1fr;
+            grid-template-rows: 1fr;
+            gap: 0;
+            padding: 0;
+        }
+
+        /* Mode Duel: Gap vertikal, 2 kolom (Desktop) atau 2 baris (Mobile Portrait) */
+        .grid-duel {
+            gap: var(--border-width);
+            padding: var(--border-width);
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr;
+        }
+
+        /* Mode Squad: Berjajar 4 kolom ke kanan */
+        .grid-squad {
+            gap: var(--border-width);
+            padding: var(--border-width);
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: 1fr;
+        }
+
+        /* Responsif untuk Layar Portrait (Mobile) */
+        @media (max-width: 768px) and (orientation: portrait) {
+            .grid-duel {
+                grid-template-columns: 1fr;
+                grid-template-rows: 1fr 1fr;
+            }
+            /* Di layar HP portrait, 4 pemain disusun ke bawah (4 baris) */
+            .grid-squad {
+                grid-template-columns: 1fr;
+                grid-template-rows: repeat(4, 1fr);
+                overflow-y: auto;
+            }
+        }
+
+        /* --- PENYESUAIAN HEADER SOLO MODE --- */
+        .grid-solo .p-indicator {
+            display: none; /* Sembunyikan teks PLAYER 1 karena sudah pasti main sendiri */
+        }
+        
+        .grid-solo .player-header {
+            justify-content: center;
+            font-size: 1.1rem;
+            padding: 10px;
+        }
+
+        .grid-solo .p-stats {
+            gap: 30px;
+        }
+
+        /* --- PLAYER INSTANCE --- */
+        .player-area {
+            background: white;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            /* Pastikan player area memenuhi sel grid-nya */
+            width: 100%;
+            height: 100%;
+        }
+
+        /* Player Header */
+        .player-header {
+            background: var(--primary);
+            color: white;
+            padding: 5px 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+            z-index: 10;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .p-indicator { font-weight: bold; padding: 2px 6px; background: rgba(0,0,0,0.2); border-radius: 4px; }
+        .p-stats { display: flex; gap: 10px; align-items: center; }
+        .p-score { font-weight: bold; color: var(--secondary); text-shadow: 1px 1px 0 #000; }
+        .p-lives { color: #ff5252; text-shadow: 1px 1px 0 #000; letter-spacing: 2px;}
+
+        /* Game & Control Layout based on aspect ratio */
+        .player-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        @media (orientation: landscape) and (min-width: 600px) {
+            .player-content { flex-direction: row; }
+        }
+
+        /* --- GAME VIEWPORT (Water, Leaves, Frog) --- */
+        .game-viewport {
+            flex: 1;
+            position: relative;
+            background: linear-gradient(180deg, #E1F5FE 0%, var(--water-light) 50%, var(--water-dark) 100%);
+            overflow: hidden;
+            border-bottom: 2px solid rgba(0,0,0,0.1);
+        }
+        @media (orientation: landscape) and (min-width: 600px) {
+            .game-viewport { border-bottom: none; border-right: 2px solid rgba(0,0,0,0.1); }
+        }
+
+        /* Background Elements */
+        .cloud { position: absolute; background: white; border-radius: 50px; opacity: 0.8; }
+        .cloud::before, .cloud::after { content: ''; position: absolute; background: white; border-radius: 50%; }
+
+        /* The Platform System */
+        .platform-system {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column-reverse; /* Bottom up */
+            align-items: center;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        .leaf-platform {
+            width: 120px;
+            height: 60px;
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            font-size: 1.5rem;
+            color: white;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            /* Centered horizontally, absolute vertically managed by JS */
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        /* SVG Leaf Background */
+        .leaf-svg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
+        }
+        .leaf-text { position: relative; z-index: 2; }
+
+        /* --- ANIMATIONS & ENTITIES --- */
+        .frog-entity {
+            position: absolute;
+            width: 60px;
+            height: 60px;
+            left: 50%;
+            margin-left: -30px;
+            z-index: 10;
+            transform-origin: bottom center;
+            transition: transform 0.1s;
+            pointer-events: none;
+        }
+
+        /* Animation Classes for Frog */
+        .frog-idle { animation: breathe 1s infinite alternate; }
+        .frog-jump { animation: jumpAnim 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards; }
+        .frog-fall { animation: fallAnim 0.6s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards; }
+
+        @keyframes breathe { 0% { transform: scaleY(1) scaleX(1); } 100% { transform: scaleY(0.95) scaleX(1.05); } }
+        @keyframes jumpAnim {
+            0% { transform: translateY(0) scale(1.1, 0.9); }
+            50% { transform: translateY(-80px) scale(0.9, 1.1); }
+            100% { transform: translateY(-120px) scale(1, 1); } /* Distance depends on level gap */
+        }
+        @keyframes fallAnim {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(150px) rotate(180deg) scale(0.5); opacity: 0; }
+        }
+
+        /* Splash Effect */
+        .splash-effect {
+            position: absolute;
+            width: 80px;
+            height: 30px;
+            left: 50%;
+            margin-left: -40px;
+            background: radial-gradient(ellipse at center, rgba(255,255,255,0.8) 0%, rgba(255,255,255,0) 70%);
+            border-radius: 50%;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 5;
+        }
+        .splash-active { animation: rippleAnim 0.6s ease-out forwards; }
+        @keyframes rippleAnim {
+            0% { transform: scale(0); opacity: 1; }
+            100% { transform: scale(3); opacity: 0; }
+        }
+
+        /* Sparkle Effect */
+        .sparkle {
+            position: absolute;
+            color: var(--secondary);
+            font-size: 20px;
+            pointer-events: none;
+            z-index: 15;
+            animation: sparkleAnim 0.8s ease-out forwards;
+        }
+        @keyframes sparkleAnim {
+            0% { transform: translate(0,0) scale(0) rotate(0deg); opacity: 1; }
+            100% { transform: translate(var(--tx), var(--ty)) scale(1.5) rotate(180deg); opacity: 0; }
+        }
+
+        /* --- CONTROL AREA (Question & Buttons) --- */
+        .control-area {
+            flex: 0.8;
+            background: #F5F5F5;
+            display: flex;
+            flex-direction: column;
+            padding: 10px;
+            gap: 10px;
+        }
+
+        @media (orientation: landscape) and (min-width: 600px) {
+            .control-area { flex: 1; padding: 20px; justify-content: center; }
+        }
+
+        .question-box {
+            background: white;
+            padding: 10px; /* Padding sedikit dikurangi agar lebih hemat ruang */
+            border-radius: var(--radius-md);
+            text-align: center;
+            font-size: 1.3rem; /* Ukuran font diperkecil dari 2rem */
+            font-weight: bold;
+            color: var(--primary-dark);
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.1);
+            border: 2px dashed #ccc;
+            white-space: nowrap; /* Memaksa teks soal selalu satu baris */
+            overflow: hidden; /* Mencegah elemen rusak jika layar terlalu sempit */
+            text-overflow: ellipsis; /* Menambahkan titik-titik jika soal terpotong (opsional) */
+        }
+
+        .options-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .option-btn {
+            background: white;
+            border: 2px solid var(--water-light);
+            border-radius: var(--radius-md);
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--text-dark);
+            cursor: pointer;
+            box-shadow: 0 4px 0px var(--water-light);
+            transition: all 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .option-btn:active:not(:disabled) {
+            transform: translateY(4px);
+            box-shadow: 0 0px 0px var(--water-light);
+        }
+        
+        .option-btn:disabled { opacity: 0.7; cursor: not-allowed; }
+        .option-btn.correct { background: var(--primary); color: white; border-color: var(--primary-dark); box-shadow: 0 4px 0px var(--primary-dark); }
+        .option-btn.wrong { background: var(--danger); color: white; border-color: #b71c1c; box-shadow: 0 4px 0px #b71c1c; }
+
+        .feedback-text {
+            text-align: center;
+            font-weight: bold;
+            height: 24px;
+            font-size: 1rem;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .feedback-text.show { opacity: 1; }
+        .feedback-correct { color: var(--primary-dark); }
+        .feedback-wrong { color: var(--danger); }
+
+        .progress-bar-bg {
+            height: 10px;
+            background: #e0e0e0;
+            border-radius: 5px;
+            overflow: hidden;
+            margin-top: auto;
+        }
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--secondary);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* --- GAME OVER SCREEN --- */
+        #gameover-screen {
+            background: rgba(0,0,0,0.8);
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .gameover-card {
+            background: white;
+            padding: 30px;
+            border-radius: var(--radius-lg);
+            text-align: center;
+            width: 100%;
+            max-width: 600px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+
+        .gameover-title {
+            font-size: 2.5rem;
+            color: var(--danger);
+            margin-bottom: 20px;
+        }
+
+        .results-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+            max-height: 50vh;
+            overflow-y: auto;
+        }
+
+        .player-result {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: var(--radius-md);
+            border: 2px solid #ddd;
+        }
+
+        .player-result h3 { color: var(--primary-dark); margin-bottom: 10px; }
+        .stat-row { display: flex; justify-content: space-between; margin-bottom: 5px; font-weight: bold; }
+        
+        /* Overlay for inactive players in multi */
+        .player-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
+        }
+        .player-overlay.show { opacity: 1; pointer-events: auto; }
+
+        /* Player Colors Variables */
+        .p1-color { background-color: #4CAF50 !important; }
+        .p2-color { background-color: #F44336 !important; }
+        .p3-color { background-color: #2196F3 !important; }
+        .p4-color { background-color: #9C27B0 !important; }
+    </style>
+</head>
+<body>
+    <!-- GLOBAL HEADER -->
+    <header class="header-global">
+        <div class="header-title">
+            🐸 Frog Math
+        </div>
+        <div class="header-controls">
+            <button class="icon-btn" id="btn-bgm" onclick="toggleBGM()">🔈</button>
+            <button class="icon-btn" id="btn-fullscreen" onclick="toggleFullScreen()">⛶</button>
+        </div>
+    </header>
+
+    <div id="app">
+        <!-- 1. MENU SCREEN -->
+        <div id="menu-screen" class="screen active">
+            <div class="menu-title-container">
+                <h1 class="menu-title">FROG MATH<br>ADVENTURE</h1>
+                <p class="menu-subtitle">Petualangan Perkalian & Pembagian</p>
+            </div>
+            
+            <div class="menu-buttons">
+                <button class="btn btn-primary" onclick="goToSetup('solo')">👤 SOLO (1 Pemain)</button>
+                <button class="btn btn-secondary" onclick="goToSetup('duel')">👥 DUEL (2 Pemain)</button>
+                <button class="btn btn-water" onclick="goToSetup('squad')">👥👥 SQUAD (4 Pemain)</button>
+            </div>
+
+            <div class="credit">Dibuat oleh: Nurul Layalil A’dadiyyah, S.Pd.</div>
+        </div>
+
+        <!-- 2. SETUP SCREEN -->
+        <div id="setup-screen" class="screen">
+            <div class="setup-card">
+                <h2>Pengaturan Permainan</h2>
+                
+                <div class="setup-group">
+                    <label>Jumlah Soal:</label>
+                    <div class="setup-options" id="opt-questions">
+                        <div class="setup-option selected" onclick="selectOption('questions', 10)">10 Soal</div>
+                        <div class="setup-option" onclick="selectOption('questions', 20)">20 Soal</div>
+                        <div class="setup-option" onclick="selectOption('questions', 30)">30 Soal</div>
+                    </div>
+                </div>
+
+                <div class="setup-group">
+                    <label>Materi:</label>
+                    <div class="setup-options" id="opt-type">
+                        <div class="setup-option" onclick="selectOption('type', 'perkalian')">Perkalian (×)</div>
+                        <div class="setup-option" onclick="selectOption('type', 'pembagian')">Pembagian (÷)</div>
+                        <div class="setup-option selected" onclick="selectOption('type', 'campuran')">Campuran</div>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-top: 30px;">
+                    <button class="btn btn-danger" style="flex: 1;" onclick="showScreen('menu-screen')">Kembali</button>
+                    <button class="btn btn-primary" style="flex: 2;" onclick="startGame()">Mulai Main!</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. GAME SCREEN -->
+        <div id="game-screen" class="screen">
+            <div id="game-grid-container" class="game-grid">
+                <!-- Player instances injected here via JS -->
+            </div>
+        </div>
+
+        <!-- 4. GAME OVER SCREEN -->
+        <div id="gameover-screen" class="screen" style="display: none;">
+            <div class="gameover-card">
+                <h1 class="gameover-title">🐸 GAME OVER 🐸</h1>
+                
+                <div class="results-container" id="results-container">
+                    <!-- Results injected here -->
+                </div>
+
+                <div style="display: flex; gap: 15px; justify-content: center;">
+                    <button class="btn btn-primary" onclick="startGame()">🔄 Main Lagi</button>
+                    <button class="btn btn-danger" onclick="showScreen('menu-screen')">🏠 Menu Utama</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TEMPLATES FOR DYNAMIC GENERATION -->
+    <template id="player-template">
+        <div class="player-area" id="player-{id}">
+            <div class="player-header p{id}-color">
+                <span class="p-indicator">PLAYER {id}</span>
+                <div class="p-stats">
+                    <span class="p-score">⭐ <span id="score-{id}">0</span></span>
+                    <span class="p-lives" id="lives-{id}">❤️❤️❤️</span>
+                </div>
+            </div>
+            
+            <div class="player-content">
+                <div class="game-viewport">
+                    <!-- Background decor -->
+                    <div class="cloud" style="top: 10%; left: 10%; width: 60px; height: 20px;"></div>
+                    <div class="cloud" style="top: 30%; right: 20%; width: 80px; height: 25px;"></div>
+                    
+                    <div class="platform-system" id="platforms-{id}">
+                        <!-- Platforms injected here -->
+                    </div>
+                    
+                    <!-- Frog SVG SVG -->
+                    <div class="frog-entity frog-idle" id="frog-{id}" style="bottom: 40px;">
+                        <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                            <!-- Body -->
+                            <ellipse cx="50" cy="60" rx="35" ry="30" fill="var(--primary)"/>
+                            <ellipse cx="50" cy="70" rx="25" ry="15" fill="#E8F5E9"/>
+                            <!-- Legs -->
+                            <path d="M20,60 Q5,70 10,90 Q20,95 25,80 Z" fill="var(--primary-dark)"/>
+                            <path d="M80,60 Q95,70 90,90 Q80,95 75,80 Z" fill="var(--primary-dark)"/>
+                            <!-- Eyes -->
+                            <circle cx="30" cy="35" r="15" fill="var(--primary)"/>
+                            <circle cx="70" cy="35" r="15" fill="var(--primary)"/>
+                            <circle cx="30" cy="35" r="10" fill="white"/>
+                            <circle cx="70" cy="35" r="10" fill="white"/>
+                            <circle cx="30" cy="35" r="5" fill="black"/>
+                            <circle cx="70" cy="35" r="5" fill="black"/>
+                            <!-- Smile -->
+                            <path d="M 40 65 Q 50 75 60 65" stroke="black" stroke-width="3" fill="transparent" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+
+                    <!-- Water Splash -->
+                    <div class="splash-effect" id="splash-{id}" style="bottom: 20px;"></div>
+                </div>
+
+                <div class="control-area">
+                    <div class="question-box" id="question-{id}">?</div>
+                    
+                    <div class="options-grid" id="options-{id}">
+                        <!-- Buttons injected here -->
+                    </div>
+
+                    <div class="feedback-text" id="feedback-{id}"></div>
+                    
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" id="progress-{id}"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Overlay for Game Over state per player -->
+            <div class="player-overlay" id="overlay-{id}">
+                <div>Selesai!</div>
+                <div style="font-size: 1rem; margin-top: 10px;">Menunggu pemain lain...</div>
+            </div>
+        </div>
+    </template>
+
+    <template id="leaf-template">
+        <div class="leaf-platform" style="bottom: {bottom}px;">
+            <svg class="leaf-svg" viewBox="0 0 100 50" preserveAspectRatio="none">
+                <ellipse cx="50" cy="25" rx="48" ry="20" fill="var(--leaf-color)" stroke="var(--leaf-dark)" stroke-width="2"/>
+                <path d="M 50 5 L 50 45" stroke="var(--leaf-dark)" stroke-width="2" stroke-linecap="round"/>
+                <!-- Cutout to make it look like lotus leaf -->
+                <polygon points="50,25 30,5 70,5" fill="var(--bg-color)" />
+            </svg>
+            <span class="leaf-text">{text}</span>
+        </div>
+    </template>
+
+    <script>
+        // --- 1. CONFIG & STATE ---
+        const GAME_CONFIG = {
+            baseDistance: 120, // Distance between platforms
+            platformStart: 30, // Start height from bottom
+            pointsPerCorrect: 10,
+            comboThresholds: [2, 3, 5],
+            comboBonus: [5, 10, 25],
+            maxLives: 3
+        };
+
+        let gameState = {
+            mode: 'solo', // solo, duel, squad
+            settings: { questions: 20, type: 'campuran' }, // type: perkalian, pembagian, campuran
+            players: [],
+            activePlayers: 0,
+            isBgmPlaying: false
+        };
+
+        // --- 2. AUDIO SYNTHESIZER (No external files) ---
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        
+        function playTone(freq, type, duration, vol=0.1, slideFreq=null) {
+            if(audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = type;
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+            if (slideFreq) {
+                osc.frequency.exponentialRampToValueAtTime(slideFreq, audioCtx.currentTime + duration);
+            }
+            
+            gain.gain.setValueAtTime(vol, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        const SFX = {
+            jump: () => playTone(300, 'sine', 0.3, 0.2, 600),
+            splash: () => playTone(100, 'square', 0.4, 0.2, 50),
+            correct: () => {
+                playTone(400, 'sine', 0.1, 0.1);
+                setTimeout(() => playTone(600, 'sine', 0.2, 0.1), 100);
+            },
+            wrong: () => {
+                playTone(300, 'sawtooth', 0.2, 0.1, 150);
+            },
+            gameOver: () => {
+                playTone(200, 'sawtooth', 0.5, 0.2, 50);
+            }
+        };
+
+        // Simple BGM Loop
+        let bgmOsc = null;
+        let bgmGain = null;
+        let bgmInterval = null;
+        const melody = [261.63, 329.63, 392.00, 523.25, 392.00, 329.63]; // C E G C G E
+        let noteIdx = 0;
+
+        function toggleBGM() {
+            gameState.isBgmPlaying = !gameState.isBgmPlaying;
+            const btn = document.getElementById('btn-bgm');
+            
+            if (gameState.isBgmPlaying) {
+                if(audioCtx.state === 'suspended') audioCtx.resume();
+                btn.textContent = '🔊';
+                bgmInterval = setInterval(() => {
+                    const freq = melody[noteIdx % melody.length];
+                    playTone(freq, 'triangle', 0.2, 0.05);
+                    noteIdx++;
+                }, 400);
+            } else {
+                btn.textContent = '🔈';
+                clearInterval(bgmInterval);
+            }
+        }
+
+        // --- 3. UI MANAGEMENT ---
+        function showScreen(screenId) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(screenId).classList.add('active');
+            if(screenId === 'gameover-screen') {
+                document.getElementById('game-screen').classList.add('active'); // Keep game visible behind overlay
+                document.getElementById('gameover-screen').style.display = 'flex';
+            } else {
+                document.getElementById('gameover-screen').style.display = 'none';
+            }
+        }
+
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log(`Error attempting to enable fullscreen: ${err.message}`);
+                });
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen();
+            }
+        }
+
+        // --- 4. SETUP LOGIC ---
+        function goToSetup(mode) {
+            gameState.mode = mode;
+            showScreen('setup-screen');
+        }
+
+        function selectOption(category, value) {
+            gameState.settings[category] = value;
+            const parent = document.getElementById(`opt-${category}`);
+            parent.querySelectorAll('.setup-option').forEach(el => el.classList.remove('selected'));
+            event.target.classList.add('selected');
+        }
+
+        // --- 5. MATH GENERATOR ---
+        function generateQuestion(typeSetting) {
+            let type = typeSetting;
+            if (type === 'campuran') {
+                type = Math.random() > 0.5 ? 'perkalian' : 'pembagian';
+            }
+
+            let a, b, answer, questionText;
+            let choices = new Set();
+
+            if (type === 'perkalian') {
+                a = Math.floor(Math.random() * 9) + 2; // 2 to 10
+                b = Math.floor(Math.random() * 9) + 2; // 2 to 10
+                answer = a * b;
+                questionText = `${a} × ${b} = ?`;
+            } else {
+                // Pembagian: ensure integer result
+                b = Math.floor(Math.random() * 9) + 2; // divisor 2 to 10
+                answer = Math.floor(Math.random() * 9) + 2; // result 2 to 10
+                a = b * answer; // dividend
+                questionText = `${a} ÷ ${b} = ?`;
+            }
+
+            choices.add(answer);
+
+            // Generate plausible distractors
+            while (choices.size < 4) {
+                let r = Math.random();
+                let wrong;
+                if (type === 'perkalian') {
+                    if(r < 0.3) wrong = (a + 1) * b;
+                    else if(r < 0.6) wrong = a * (b + 1);
+                    else wrong = answer + (Math.floor(Math.random() * 5) + 1) * (Math.random() > 0.5 ? 1 : -1);
+                } else {
+                    if(r < 0.3) wrong = answer + 1;
+                    else if(r < 0.6) wrong = answer - 1;
+                    else wrong = answer + (Math.floor(Math.random() * 3) + 2) * (Math.random() > 0.5 ? 1 : -1);
+                }
+                
+                if (wrong > 0 && wrong !== answer) {
+                    choices.add(wrong);
+                }
+            }
+
+            // Shuffle array
+            let choicesArr = Array.from(choices);
+            for (let i = choicesArr.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [choicesArr[i], choicesArr[j]] = [choicesArr[j], choicesArr[i]];
+            }
+
+            return { text: questionText, answer: answer, choices: choicesArr };
+        }
+
+        // --- 6. GAME INITIALIZATION ---
+        function startGame() {
+            let numPlayers = 1;
+            if (gameState.mode === 'duel') numPlayers = 2;
+            if (gameState.mode === 'squad') numPlayers = 4;
+
+            gameState.activePlayers = numPlayers;
+            gameState.players = [];
+            
+            const container = document.getElementById('game-grid-container');
+            container.innerHTML = ''; // clear previous
+            
+            // Set Grid Class based on Mode
+            container.className = 'game-grid';
+            if(numPlayers === 1) {
+                container.classList.add('grid-solo');
+                
+                // Minta akses layar penuh (fullscreen) secara otomatis untuk mode solo
+                if (!document.fullscreenElement) {
+                    document.documentElement.requestFullscreen().catch(err => {
+                        console.log(`Fullscreen error: ${err.message}`);
+                    });
+                }
+            } else if(numPlayers === 2) {
+                container.classList.add('grid-duel');
+            } else if(numPlayers === 4) {
+                container.classList.add('grid-squad');
+            }
+
+            const template = document.getElementById('player-template').innerHTML;
+
+            for (let i = 1; i <= numPlayers; i++) {
+                // Init State
+                gameState.players.push({
+                    id: i,
+                    score: 0,
+                    lives: GAME_CONFIG.maxLives,
+                    combo: 0,
+                    maxCombo: 0,
+                    correctCount: 0,
+                    qCount: 0,
+                    status: 'playing', // playing, dead, finished
+                    currentQ: null,
+                    platformIndex: 0 // How high they have climbed locally
+                });
+
+                // Build DOM
+                let html = template.replace(/{id}/g, i);
+                let div = document.createElement('div');
+                div.innerHTML = html;
+                container.appendChild(div.firstElementChild);
+            }
+
+            showScreen('game-screen');
+
+            // Start First Question for all
+            gameState.players.forEach(p => {
+                initPlatforms(p.id);
+                nextQuestion(p.id);
+            });
+        }
+
+        function initPlatforms(pid) {
+            const container = document.getElementById(`platforms-${pid}`);
+            container.innerHTML = '';
+            container.style.transform = `translateY(0px)`;
+            
+            // Create start platform and next platform
+            createLeaf(pid, 0, ""); // Base leaf
+            createLeaf(pid, 1, "?"); // Next leaf
+        }
+
+        function createLeaf(pid, index, text) {
+            const container = document.getElementById(`platforms-${pid}`);
+            const tpl = document.getElementById('leaf-template').innerHTML;
+            
+            const bottomPos = GAME_CONFIG.platformStart + (index * GAME_CONFIG.baseDistance);
+            
+            let html = tpl.replace('{bottom}', bottomPos).replace('{text}', text);
+            let div = document.createElement('div');
+            div.innerHTML = html.trim();
+            let leaf = div.firstChild;
+            leaf.id = `leaf-${pid}-${index}`;
+            container.appendChild(leaf);
+            return leaf;
+        }
+
+        function updateLivesUI(pid) {
+            const p = gameState.players.find(x => x.id === pid);
+            let hearts = '';
+            for(let i=0; i < p.lives; i++) hearts += '❤️';
+            for(let i=0; i < (GAME_CONFIG.maxLives - p.lives); i++) hearts += '🖤';
+            document.getElementById(`lives-${pid}`).textContent = hearts;
+        }
+
+        // --- 7. GAMEPLAY LOGIC ---
+        function nextQuestion(pid) {
+            const p = gameState.players.find(x => x.id === pid);
+            
+            // Check win condition
+            if (p.qCount >= gameState.settings.questions) {
+                playerFinished(pid, true);
+                return;
+            }
+
+            p.qCount++;
+            p.currentQ = generateQuestion(gameState.settings.type);
+            
+            // Update UI
+            document.getElementById(`question-${pid}`).textContent = p.currentQ.text;
+            
+            const optionsContainer = document.getElementById(`options-${pid}`);
+            optionsContainer.innerHTML = '';
+            
+            p.currentQ.choices.forEach((choice, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'option-btn';
+                btn.textContent = choice;
+                btn.onclick = () => handleAnswer(pid, choice, btn);
+                optionsContainer.appendChild(btn);
+            });
+
+            // Update next leaf text
+            const nextLeaf = document.getElementById(`leaf-${pid}-${p.platformIndex + 1}`);
+            if(nextLeaf) nextLeaf.querySelector('.leaf-text').textContent = "?";
+
+            // Update Progress
+            const pct = (p.qCount - 1) / gameState.settings.questions * 100;
+            document.getElementById(`progress-${pid}`).style.width = `${pct}%`;
+            
+            // Clear feedback
+            const fb = document.getElementById(`feedback-${pid}`);
+            fb.className = 'feedback-text';
+            fb.textContent = '';
+        }
+
+        function handleAnswer(pid, selectedAnswer, btnElement) {
+            const p = gameState.players.find(x => x.id === pid);
+            if (p.status !== 'playing') return;
+
+            // Disable buttons temporarily
+            const buttons = document.getElementById(`options-${pid}`).querySelectorAll('.option-btn');
+            buttons.forEach(b => b.disabled = true);
+
+            const isCorrect = selectedAnswer === p.currentQ.answer;
+            const frog = document.getElementById(`frog-${pid}`);
+            const fb = document.getElementById(`feedback-${pid}`);
+
+            if (isCorrect) {
+                // --- CORRECT ANSWER FLOW ---
+                btnElement.classList.add('correct');
+                SFX.correct();
+                
+                p.correctCount++;
+                p.combo++;
+                if (p.combo > p.maxCombo) p.maxCombo = p.combo;
+
+                // Score calculation
+                let pts = GAME_CONFIG.pointsPerCorrect;
+                if(p.combo >= 5) pts += GAME_CONFIG.comboBonus[2];
+                else if(p.combo >= 3) pts += GAME_CONFIG.comboBonus[1];
+                else if(p.combo >= 2) pts += GAME_CONFIG.comboBonus[0];
+                p.score += pts;
+                
+                document.getElementById(`score-${pid}`).textContent = p.score;
+                
+                fb.textContent = p.combo > 1 ? `🎉 Hebat! Combo x${p.combo}` : '🎉 Benar!';
+                fb.className = 'feedback-text show feedback-correct';
+
+                // Put answer on next leaf
+                const nextLeaf = document.getElementById(`leaf-${pid}-${p.platformIndex + 1}`);
+                if(nextLeaf) nextLeaf.querySelector('.leaf-text').textContent = selectedAnswer;
+
+                // Animate Frog Jump
+                frog.classList.remove('frog-idle');
+                frog.classList.add('frog-jump');
+                SFX.jump();
+
+                // Create Sparkles
+                createSparkles(pid, btnElement);
+
+                setTimeout(() => {
+                    frog.classList.remove('frog-jump');
+                    frog.classList.add('frog-idle');
+                    
+                    // Move World Down
+                    p.platformIndex++;
+                    const platformContainer = document.getElementById(`platforms-${pid}`);
+                    platformContainer.style.transform = `translateY(${p.platformIndex * GAME_CONFIG.baseDistance}px)`;
+                    
+                    // Generate new leaf above
+                    createLeaf(pid, p.platformIndex + 1, "?");
+
+                    // Next question
+                    setTimeout(() => nextQuestion(pid), 300);
+
+                }, 500); // Wait for jump animation
+
+            } else {
+                // --- WRONG ANSWER FLOW ---
+                btnElement.classList.add('wrong');
+                SFX.wrong();
+                
+                p.combo = 0;
+                p.lives--;
+                updateLivesUI(pid);
+
+                fb.textContent = '💧 Belum tepat, coba lagi!';
+                fb.className = 'feedback-text show feedback-wrong';
+
+                // Find correct button to highlight
+                buttons.forEach(b => {
+                    if(parseInt(b.textContent) === p.currentQ.answer) b.classList.add('correct');
+                });
+
+                // Animate Frog Fall
+                frog.classList.remove('frog-idle');
+                frog.classList.add('frog-fall');
+                
+                setTimeout(() => {
+                    SFX.splash();
+                    const splash = document.getElementById(`splash-${pid}`);
+                    splash.classList.remove('splash-active');
+                    void splash.offsetWidth; // trigger reflow
+                    splash.classList.add('splash-active');
+                }, 300);
+
+                setTimeout(() => {
+                    if (p.lives <= 0) {
+                        playerFinished(pid, false);
+                    } else {
+                        // Reset Frog to current platform
+                        frog.classList.remove('frog-fall');
+                        frog.classList.add('frog-idle');
+                        nextQuestion(pid);
+                    }
+                }, 1000); // Wait for fall and splash
+            }
+        }
+
+        function createSparkles(pid, btnElement) {
+            const rect = btnElement.getBoundingClientRect();
+            const container = document.getElementById(`player-${pid}`);
+            const cRect = container.getBoundingClientRect();
+            
+            for(let i=0; i<5; i++) {
+                const s = document.createElement('div');
+                s.className = 'sparkle';
+                s.textContent = '✨';
+                // Position relative to player container
+                s.style.left = (rect.left - cRect.left + rect.width/2) + 'px';
+                s.style.top = (rect.top - cRect.top + rect.height/2) + 'px';
+                
+                // Random translation for animation
+                const tx = (Math.random() - 0.5) * 100 + 'px';
+                const ty = (Math.random() - 1) * 100 + 'px';
+                s.style.setProperty('--tx', tx);
+                s.style.setProperty('--ty', ty);
+                
+                container.appendChild(s);
+                setTimeout(() => s.remove(), 800);
+            }
+        }
+
+        function playerFinished(pid, isWin) {
+            const p = gameState.players.find(x => x.id === pid);
+            p.status = isWin ? 'finished' : 'dead';
+            
+            // Ensure progress bar is full if win
+            if(isWin) document.getElementById(`progress-${pid}`).style.width = `100%`;
+
+            // Disable buttons
+            const buttons = document.getElementById(`options-${pid}`).querySelectorAll('.option-btn');
+            buttons.forEach(b => b.disabled = true);
+
+            // Show Overlay
+            const overlay = document.getElementById(`overlay-${pid}`);
+            overlay.innerHTML = `
+                <div style="font-size:2rem; margin-bottom:10px;">${isWin ? '🎉 Selesai!' : '💀 Game Over'}</div>
+                <div>Score: ${p.score}</div>
+            `;
+            overlay.classList.add('show');
+
+            gameState.activePlayers--;
+            
+            if (gameState.activePlayers <= 0) {
+                setTimeout(showGameOver, 1000);
+            }
+        }
+
+        function showGameOver() {
+            SFX.gameOver();
+            const container = document.getElementById('results-container');
+            container.innerHTML = '';
+
+            gameState.players.forEach(p => {
+                const div = document.createElement('div');
+                div.className = 'player-result';
+                div.innerHTML = `
+                    <h3>PLAYER ${p.id}</h3>
+                    <div class="stat-row"><span>Status:</span> <span>${p.lives > 0 ? '🏆 Selesai' : '💀 Gugur'}</span></div>
+                    <div class="stat-row"><span>Score:</span> <span style="color:var(--secondary-dark)">${p.score}</span></div>
+                    <div class="stat-row"><span>Jawaban Benar:</span> <span>${p.correctCount} / ${p.qCount}</span></div>
+                    <div class="stat-row"><span>Combo Max:</span> <span>${p.maxCombo}</span></div>
+                `;
+                container.appendChild(div);
+            });
+
+            showScreen('gameover-screen');
+        }
+
+        // Initialize Audio context on first click anywhere
+        document.body.addEventListener('click', () => {
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }, { once: true });
+
+    </script>
+</body>
+</html>
